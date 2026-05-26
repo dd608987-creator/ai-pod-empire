@@ -1,3 +1,4 @@
+from video_engine.tiktok_video_generator import TikTokVideoGenerator
 from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
 
