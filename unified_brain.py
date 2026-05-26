@@ -1,6 +1,6 @@
-from video_engine.tiktok_video_generator import TikTokVideoGenerator
 from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
+from video_engine.tiktok_video_generator import TikTokVideoGenerator
 
 class UnifiedBrain:
     def __init__(self, agents, memory, autoscaler, autolearn, autorevenue, autodesevo, logger=None):
@@ -12,8 +12,10 @@ class UnifiedBrain:
         self.autodesevo = autodesevo
         self.logger = logger
 
+        # Reasoning engine
         self.reasoning = ReasoningCore(logger=logger)
 
+        # Orchestrator
         self.orchestrator = Orchestrator(
             agents=agents,
             memory=memory,
@@ -23,6 +25,9 @@ class UnifiedBrain:
             autodesevo=autodesevo,
             logger=logger
         )
+
+        # TikTok Video Engine
+        self.video_engine = TikTokVideoGenerator(logger=logger)
 
     def think(self, context):
         """
@@ -45,7 +50,19 @@ class UnifiedBrain:
         if self.logger:
             self.logger.info("UnifiedBrain: running full cycle.")
 
+        # Run orchestrator
         cycle_output = self.orchestrator.run_cycle(market)
+
+        # Generate TikTok video
+        video_output = self.video_engine.generate(
+            design_path="assets/sample_design.png",
+            text_lines=[
+                "🔥 New Trending Design",
+                "Made by AI POD Empire",
+                "Available Now!"
+            ],
+            output_path="output/tiktok_video.mp4"
+        )
 
         # Save insights to memory
         self.memory.save({
@@ -55,5 +72,6 @@ class UnifiedBrain:
 
         return {
             "status": "cycle_complete",
-            "output": cycle_output
+            "output": cycle_output,
+            "tiktok_video": video_output
         }
