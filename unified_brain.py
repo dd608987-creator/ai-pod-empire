@@ -1,6 +1,7 @@
 from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
 from video_engine.tiktok_video_generator import TikTokVideoGenerator
+from marketingengine.automarketing import AutoMarketingEngine
 
 class UnifiedBrain:
     def __init__(self, agents, memory, autoscaler, autolearn, autorevenue, autodesevo, logger=None):
@@ -28,6 +29,9 @@ class UnifiedBrain:
 
         # TikTok Video Engine
         self.video_engine = TikTokVideoGenerator(logger=logger)
+
+        # Auto‑Marketing Engine
+        self.marketing = AutoMarketingEngine(logger=logger)
 
     def think(self, context):
         """
@@ -64,6 +68,11 @@ class UnifiedBrain:
             output_path="output/tiktok_video.mp4"
         )
 
+        # Auto‑Marketing distribution
+        marketing_output = self.marketing.distribute(
+            video_path="output/tiktok_video.mp4"
+        )
+
         # Save insights to memory
         self.memory.save({
             "insights": ["Cycle completed successfully"],
@@ -73,5 +82,6 @@ class UnifiedBrain:
         return {
             "status": "cycle_complete",
             "output": cycle_output,
-            "tiktok_video": video_output
+            "tiktok_video": video_output,
+            "marketing": marketing_output
         }
