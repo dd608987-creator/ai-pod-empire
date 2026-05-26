@@ -2,6 +2,8 @@ from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
 from video_engine.tiktok_video_generator import TikTokVideoGenerator
 from marketingengine.automarketing import AutoMarketingEngine
+from analyticengine.autoanalytics import AutoAnalyticsEngine
+
 
 class UnifiedBrain:
     def __init__(self, agents, memory, autoscaler, autolearn, autorevenue, autodesevo, logger=None):
@@ -33,6 +35,10 @@ class UnifiedBrain:
         # Auto‑Marketing Engine
         self.marketing = AutoMarketingEngine(logger=logger)
 
+        # Auto‑Analytics Engine
+        self.analytics = AutoAnalyticsEngine(logger=logger)
+
+
     def think(self, context):
         """
         Unified reasoning layer.
@@ -46,6 +52,7 @@ class UnifiedBrain:
             "status": "thinking_complete",
             "reasoning": reasoning_output
         }
+
 
     def run_cycle(self, market):
         """
@@ -73,6 +80,12 @@ class UnifiedBrain:
             video_path="output/tiktok_video.mp4"
         )
 
+        # Auto‑Analytics report
+        analytics_output = self.analytics.full_report(
+            cycle_output=cycle_output,
+            marketing_output=marketing_output
+        )
+
         # Save insights to memory
         self.memory.save({
             "insights": ["Cycle completed successfully"],
@@ -83,5 +96,6 @@ class UnifiedBrain:
             "status": "cycle_complete",
             "output": cycle_output,
             "tiktok_video": video_output,
-            "marketing": marketing_output
+            "marketing": marketing_output,
+            "analytics": analytics_output
         }
