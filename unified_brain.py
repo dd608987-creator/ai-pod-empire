@@ -3,6 +3,7 @@ from reasoning.reasoning_core import ReasoningCore
 from video_engine.tiktok_video_generator import TikTokVideoGenerator
 from marketingengine.automarketing import AutoMarketingEngine
 from analyticengine.autoanalytics import AutoAnalyticsEngine
+from scalingengine.autoscaling_platforms import PlatformAutoScaler
 
 
 class UnifiedBrain:
@@ -37,6 +38,9 @@ class UnifiedBrain:
 
         # Auto‑Analytics Engine
         self.analytics = AutoAnalyticsEngine(logger=logger)
+
+        # Platform Auto‑Scaling Engine
+        self.platform_scaler = PlatformAutoScaler(logger=logger)
 
 
     def think(self, context):
@@ -86,6 +90,11 @@ class UnifiedBrain:
             marketing_output=marketing_output
         )
 
+        # Platform Auto‑Scaling
+        scaling_output = self.platform_scaler.analyze(
+            marketing_results=marketing_output["results"]
+        )
+
         # Save insights to memory
         self.memory.save({
             "insights": ["Cycle completed successfully"],
@@ -97,5 +106,6 @@ class UnifiedBrain:
             "output": cycle_output,
             "tiktok_video": video_output,
             "marketing": marketing_output,
-            "analytics": analytics_output
+            "analytics": analytics_output,
+            "scaling": scaling_output
         }
