@@ -1,12 +1,16 @@
 import random
 from tiktokpublisher.tiktok_api import TikTokPublisher
 
+
 class AutoMarketingEngine:
     def __init__(self, token_manager=None, logger=None):
         self.logger = logger
         self.publisher = TikTokPublisher(token_manager, logger=logger)
 
     def prepare_post(self, video_path, caption):
+        """
+        Creates a post package before publishing.
+        """
         return {
             "video": video_path,
             "caption": caption,
@@ -14,16 +18,48 @@ class AutoMarketingEngine:
         }
 
     def publish_tiktok(self, post_package):
+        """
+        Handles REAL TikTok publishing:
+        1) Upload video
+        2) Publish video
+        """
+
+        # Step 1 — Upload
         upload = self.publisher.upload_video(post_package["video"])
 
         if upload["status"] != "uploaded":
-            return upload
+            return {
+                "status": "error",
+                "step": "upload",
+                "details": upload
+            }
 
-        publish = self.publisher.publish(upload["upload_id"], post_package["caption"])
+        # Step 2 — Publish
+        publish = self.publisher.publish(
+            upload_id=upload["upload_id"],
+            caption=post_package["caption"]
+        )
 
-        return publish
+        if publish["status"] != "published":
+            return {
+                "status": "error",
+                "step": "publish",
+                "details": publish
+            }
+
+        return {
+            "status": "success",
+            "video_id": publish["video_id"]
+        }
 
     def distribute(self, video_path):
+        """
+        Full distribution pipeline:
+        - Generate caption
+        - Prepare post
+        - Publish to TikTok (REAL)
+        """
+
         caption = random.choice([
             "🔥 New AI‑Generated Design!",
             "🚀 Trending Now!",
