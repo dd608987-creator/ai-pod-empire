@@ -1,3 +1,6 @@
+from trendhunter.AutoTrendHunter import AutoTrendHunter
+
+
 class Orchestrator:
     def __init__(self, agents, memory, autoscaler, autolearn, autorevenue, autodesevo, logger=None):
         self.agents = agents
@@ -8,63 +11,37 @@ class Orchestrator:
         self.autodesevo = autodesevo
         self.logger = logger
 
+        # Trend Hunter Engine
+        self.trend_hunter = AutoTrendHunter(logger=logger)
+
     def run_cycle(self, market):
-        """
-        Full empire cycle:
-        1. Trend analysis
-        2. Niche selection
-        3. Design generation
-        4. Mockups
-        5. Collections
-        6. Learning
-        7. Scaling
-        8. Revenue optimization
-        9. Design evolution
-        """
+        if self.logger:
+            self.logger.info("Orchestrator: running cycle.")
 
-        # 1. Trends
-        trends = self.agents["trend"].generate(market)
+        # 1) Hunt trends
+        trend_data = self.trend_hunter.hunt(market=market)
 
-        # 2. Designs
-        designs = self.agents["design"].generate(trends)
+        # 2) Generate designs (placeholder)
+        designs = [
+            {"design_id": "design_001", "status": "generated"},
+            {"design_id": "design_002", "status": "generated"}
+        ]
 
-        # 3. Mockups
-        mockups = self.agents["mockups"].generate(designs)
+        # 3) Create collections (placeholder)
+        collections = [
+            {"collection_id": "col_001", "items": designs}
+        ]
 
-        # 4. Collections
-        collections = self.agents["collections"].generate(market)
-
-        # 5. Learning
-        learning = self.autolearn.learn({
-            "insights": trends,
-            "updated_strategy": "Based on new trends"
-        })
-
-        # 6. Scaling
-        scaling = self.autoscaler.scale()
-
-        # 7. Revenue Optimization
-        revenue = self.autorevenue.optimize({
-            "best_sellers": ["design_01", "design_02"],
-            "low_performers": ["design_10"],
-            "ad_spend": 500,
-            "revenue": 2500
-        })
-
-        # 8. Design Evolution
-        evolution = self.autodesevo.evolve({
-            "best_colors": ["black", "gold", "white"],
-            "best_fonts": ["Montserrat", "Roboto"],
-            "best_styles": ["minimal", "bold"]
+        # 4) Save to memory
+        self.memory.save({
+            "latest_trends": trend_data.get("pod_trends", []),
+            "market": market
         })
 
         return {
-            "trends": trends,
+            "status": "orchestrator_cycle_complete",
+            "market": market,
+            "trends": trend_data,
             "designs": designs,
-            "mockups": mockups,
-            "collections": collections,
-            "learning": learning,
-            "scaling": scaling,
-            "revenue": revenue,
-            "evolution": evolution
+            "collections": collections
         }
