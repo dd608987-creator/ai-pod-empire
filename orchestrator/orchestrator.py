@@ -20,21 +20,25 @@ class Orchestrator:
 
         # 1) Hunt trends
         trend_data = self.trend_hunter.hunt(market=market)
+        pod_trends = trend_data.get("pod_trends", [])
 
-        # 2) Generate designs (placeholder)
-        designs = [
-            {"design_id": "design_001", "status": "generated"},
-            {"design_id": "design_002", "status": "generated"}
-        ]
+        # 2) Generate designs from trends
+        designs = []
+        if "design" in self.agents:
+            for t in pod_trends:
+                trend_kw = t["keyword"]
+                design = self.agents["design"].generate_design_from_trend(trend_kw)
+                designs.append(design)
 
-        # 3) Create collections (placeholder)
+        # 3) Create collections (optional placeholder)
         collections = [
-            {"collection_id": "col_001", "items": designs}
+            {"collection_id": "col_auto_001", "items": designs}
         ]
 
         # 4) Save to memory
         self.memory.save({
-            "latest_trends": trend_data.get("pod_trends", []),
+            "latest_trends": pod_trends,
+            "generated_designs": designs,
             "market": market
         })
 
