@@ -31,7 +31,7 @@ class UnifiedBrain:
         # Reasoning Engine
         self.reasoning = ReasoningCore(logger=logger)
 
-        # Orchestrator
+        # Orchestrator (Trend Hunter is inside it)
         self.orchestrator = Orchestrator(
             agents=agents,
             memory=memory,
@@ -82,14 +82,18 @@ class UnifiedBrain:
         if self.logger:
             self.logger.info("UnifiedBrain: running full cycle.")
 
-        # 1) Run orchestrator (designs, trends, collections…)
+        # 1) Run orchestrator (includes Trend Hunter)
         cycle_output = self.orchestrator.run_cycle(market)
 
-        # 2) Generate TikTok video
+        # Extract trend
+        pod_trends = cycle_output.get("trends", {}).get("pod_trends", [])
+        main_trend = pod_trends[0]["keyword"] if pod_trends else "AI POD Empire"
+
+        # 2) Generate TikTok video with trend
         video_output = self.video_engine.generate(
             design_path="assets/sample_design.png",
             text_lines=[
-                "🔥 New Trending Design",
+                f"🔥 {main_trend}",
                 "Made by AI POD Empire",
                 "Available Now!"
             ],
@@ -115,11 +119,13 @@ class UnifiedBrain:
         # 6) Save insights to memory
         self.memory.save({
             "insights": ["Cycle completed successfully"],
+            "trend_used": main_trend,
             "strategy": "Updated after full cycle"
         })
 
         return {
             "status": "cycle_complete",
+            "trend_used": main_trend,
             "output": cycle_output,
             "tiktok_video": video_output,
             "marketing": marketing_output,
