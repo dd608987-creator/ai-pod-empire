@@ -2,6 +2,7 @@ import time
 import requests
 import json
 
+
 class TikTokTokenManager:
     def __init__(self, client_key, client_secret, refresh_token, logger=None):
         self.client_key = client_key
@@ -14,9 +15,16 @@ class TikTokTokenManager:
         self.refresh_url = "https://open.tiktokapis.com/v2/oauth/token/"
 
     def is_expired(self):
+        """
+        Checks if the current access token is expired.
+        """
         return time.time() >= self.expires_at
 
     def refresh(self):
+        """
+        Refreshes TikTok access token using the refresh_token.
+        """
+
         payload = {
             "client_key": self.client_key,
             "client_secret": self.client_secret,
@@ -24,12 +32,19 @@ class TikTokTokenManager:
             "refresh_token": self.refresh_token
         }
 
-        headers = {"Content-Type": "application/json"}
+        headers = {
+            "Content-Type": "application/json"
+        }
 
         response = requests.post(self.refresh_url, headers=headers, data=json.dumps(payload))
 
         if response.status_code != 200:
-            return {"status": "error", "details": response.text}
+            if self.logger:
+                self.logger.error(f"Token refresh error: {response.text}")
+            return {
+                "status": "error",
+                "details": response.text
+            }
 
         data = response.json().get("data", {})
 
@@ -47,6 +62,11 @@ class TikTokTokenManager:
         }
 
     def get_token(self):
+        """
+        Returns a valid access token.
+        Refreshes automatically if expired.
+        """
+
         if self.access_token is None or self.is_expired():
             self.refresh()
 
