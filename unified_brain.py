@@ -1,13 +1,25 @@
 from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
 from video_engine.tiktok_video_generator import TikTokVideoGenerator
+
 from marketingengine.automarketing import AutoMarketingEngine
 from analyticengine.autoanalytics import AutoAnalyticsEngine
 from scalingengine.autoscaling_platforms import PlatformAutoScaler
 
+from tokenmanager.tiktok_token_manager import TikTokTokenManager
+
 
 class UnifiedBrain:
-    def __init__(self, agents, memory, autoscaler, autolearn, autorevenue, autodesevo, logger=None):
+    def __init__(
+        self,
+        agents,
+        memory,
+        autoscaler,
+        autolearn,
+        autorevenue,
+        autodesevo,
+        logger=None
+    ):
         self.agents = agents
         self.memory = memory
         self.autoscaler = autoscaler
@@ -16,7 +28,7 @@ class UnifiedBrain:
         self.autodesevo = autodesevo
         self.logger = logger
 
-        # Reasoning engine
+        # Reasoning Engine
         self.reasoning = ReasoningCore(logger=logger)
 
         # Orchestrator
@@ -33,20 +45,28 @@ class UnifiedBrain:
         # TikTok Video Engine
         self.video_engine = TikTokVideoGenerator(logger=logger)
 
-        # Auto‑Marketing Engine
-        self.marketing = AutoMarketingEngine(logger=logger)
+        # TikTok Token Manager (REAL)
+        self.token_manager = TikTokTokenManager(
+            client_key="YOUR_CLIENT_KEY",
+            client_secret="YOUR_CLIENT_SECRET",
+            refresh_token="YOUR_REFRESH_TOKEN",
+            logger=logger
+        )
+
+        # Auto‑Marketing Engine (REAL TikTok Publisher)
+        self.marketing = AutoMarketingEngine(
+            token_manager=self.token_manager,
+            logger=logger
+        )
 
         # Auto‑Analytics Engine
         self.analytics = AutoAnalyticsEngine(logger=logger)
 
-        # Platform Auto‑Scaling Engine
+        # Auto‑Scaling Engine
         self.platform_scaler = PlatformAutoScaler(logger=logger)
 
 
     def think(self, context):
-        """
-        Unified reasoning layer.
-        """
         reasoning_output = self.reasoning.think(context)
 
         if self.logger:
@@ -59,16 +79,13 @@ class UnifiedBrain:
 
 
     def run_cycle(self, market):
-        """
-        Runs the full empire cycle through the orchestrator.
-        """
         if self.logger:
             self.logger.info("UnifiedBrain: running full cycle.")
 
-        # Run orchestrator (trends, designs, collections, etc.)
+        # 1) Run orchestrator (designs, trends, collections…)
         cycle_output = self.orchestrator.run_cycle(market)
 
-        # Generate TikTok video from top design (placeholder path)
+        # 2) Generate TikTok video
         video_output = self.video_engine.generate(
             design_path="assets/sample_design.png",
             text_lines=[
@@ -79,23 +96,23 @@ class UnifiedBrain:
             output_path="output/tiktok_video.mp4"
         )
 
-        # Auto‑Marketing distribution (multi‑platform)
+        # 3) REAL TikTok Publishing
         marketing_output = self.marketing.distribute(
             video_path="output/tiktok_video.mp4"
         )
 
-        # Auto‑Analytics full report
+        # 4) Analytics Engine
         analytics_output = self.analytics.full_report(
             cycle_output=cycle_output,
             marketing_output=marketing_output
         )
 
-        # Platform Auto‑Scaling
+        # 5) Auto‑Scaling Engine
         scaling_output = self.platform_scaler.analyze(
-            marketing_results=marketing_output["results"]
+            marketing_results=marketing_output.get("tiktok", {})
         )
 
-        # Save insights to memory
+        # 6) Save insights to memory
         self.memory.save({
             "insights": ["Cycle completed successfully"],
             "strategy": "Updated after full cycle"
