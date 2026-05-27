@@ -1,9 +1,9 @@
 from orchestrator.orchestrator import Orchestrator
 from reasoning.reasoning_core import ReasoningCore
-from video_engine.tiktok_video_generator import TikTokVideoGenerator
+from video_engine.TikTokVideoGenerator import TikTokVideoGenerator
 
 from marketingengine.automarketing import AutoMarketingEngine
-from analyticengine.autoanalytics import AutoAnalyticsEngine
+from analyticsengine.autoanalytics import AutoAnalyticsEngine
 from scalingengine.autoscaling_platforms import PlatformAutoScaler
 
 from tokenmanager.tiktok_token_manager import TikTokTokenManager
@@ -31,7 +31,7 @@ class UnifiedBrain:
         # Reasoning Engine
         self.reasoning = ReasoningCore(logger=logger)
 
-        # Orchestrator (Trend Hunter is inside it)
+        # Orchestrator (يحتوي Auto‑Trend Hunter + Design Agent)
         self.orchestrator = Orchestrator(
             agents=agents,
             memory=memory,
@@ -82,16 +82,28 @@ class UnifiedBrain:
         if self.logger:
             self.logger.info("UnifiedBrain: running full cycle.")
 
-        # 1) Run orchestrator (includes Trend Hunter)
+        # 1) Orchestrator: ترندات + تصميمات من الترند
         cycle_output = self.orchestrator.run_cycle(market)
 
-        # Extract trend
-        pod_trends = cycle_output.get("trends", {}).get("pod_trends", [])
-        main_trend = pod_trends[0]["keyword"] if pod_trends else "AI POD Empire"
+        designs = cycle_output.get("designs", [])
+        trends_data = cycle_output.get("trends", {})
+        pod_trends = trends_data.get("pod_trends", [])
 
-        # 2) Generate TikTok video with trend
+        # اختيار التصميم والترند الأساسي
+        if designs:
+            main_design = designs[0]
+            main_trend = main_design.get("trend", "AI POD Empire")
+            design_id = main_design.get("design_id", "design_default")
+        else:
+            main_trend = "AI POD Empire"
+            design_id = "design_default"
+
+        # 2) توليد فيديو TikTok مبني على التصميم + الترند
+        # مبدئياً نفترض أن ملف التصميم موجود كصورة بنفس الـ design_id
+        design_path = f"assets/{design_id}.png"
+
         video_output = self.video_engine.generate(
-            design_path="assets/sample_design.png",
+            design_path=design_path,
             text_lines=[
                 f"🔥 {main_trend}",
                 "Made by AI POD Empire",
@@ -100,7 +112,7 @@ class UnifiedBrain:
             output_path="output/tiktok_video.mp4"
         )
 
-        # 3) REAL TikTok Publishing
+        # 3) النشر الحقيقي على TikTok
         marketing_output = self.marketing.distribute(
             video_path="output/tiktok_video.mp4"
         )
@@ -116,16 +128,19 @@ class UnifiedBrain:
             marketing_results=marketing_output.get("tiktok", {})
         )
 
-        # 6) Save insights to memory
+        # 6) حفظ الـ insights في الذاكرة
         self.memory.save({
             "insights": ["Cycle completed successfully"],
             "trend_used": main_trend,
+            "design_used": design_id,
             "strategy": "Updated after full cycle"
         })
 
         return {
             "status": "cycle_complete",
+            "market": market,
             "trend_used": main_trend,
+            "design_used": design_id,
             "output": cycle_output,
             "tiktok_video": video_output,
             "marketing": marketing_output,
