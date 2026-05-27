@@ -43,7 +43,13 @@ class AutoAnalyticsEngine:
 
         return {
             "market_trend_strength": random.uniform(0.5, 1.0),
-            "recommended_focus": random.choice(["Minimalist", "Vintage", "Arabic Calligraphy", "Anime", "Streetwear"])
+            "recommended_focus": random.choice([
+                "Minimalist",
+                "Vintage",
+                "Arabic Calligraphy",
+                "Anime",
+                "Streetwear"
+            ])
         }
 
     def full_report(self, cycle_output, marketing_output):
