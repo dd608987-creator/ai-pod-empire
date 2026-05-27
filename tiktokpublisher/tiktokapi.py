@@ -2,21 +2,16 @@ import requests
 import json
 
 class TikTokPublisher:
-    def __init__(self, access_token, advertiser_id=None, logger=None):
-        self.access_token = access_token
-        self.advertiser_id = advertiser_id
+    def __init__(self, token_manager, logger=None):
+        self.token_manager = token_manager
         self.logger = logger
 
         self.upload_url = "https://open.tiktokapis.com/v2/video/upload/"
         self.publish_url = "https://open.tiktokapis.com/v2/video/publish/"
 
     def upload_video(self, video_path):
-        """
-        Uploads a video to TikTok servers.
-        """
-
         headers = {
-            "Authorization": f"Bearer {self.access_token}"
+            "Authorization": f"Bearer {self.token_manager.get_token()}"
         }
 
         files = {
@@ -30,18 +25,11 @@ class TikTokPublisher:
 
         upload_id = response.json().get("data", {}).get("upload_id")
 
-        return {
-            "status": "uploaded",
-            "upload_id": upload_id
-        }
+        return {"status": "uploaded", "upload_id": upload_id}
 
     def publish(self, upload_id, caption):
-        """
-        Publishes the uploaded video to TikTok.
-        """
-
         headers = {
-            "Authorization": f"Bearer {self.access_token}",
+            "Authorization": f"Bearer {self.token_manager.get_token()}",
             "Content-Type": "application/json"
         }
 
